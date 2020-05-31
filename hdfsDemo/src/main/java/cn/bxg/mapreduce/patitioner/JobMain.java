@@ -7,7 +7,9 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import java.io.IOException;
 import java.net.URI;
@@ -23,14 +25,14 @@ public class JobMain {
         //文件路径
         String inPath = "hdfs://had-node:8020/partition/input";
         String outPath = "hdfs://had-node:8020/partition/output";
-        Configuration conf = new Configuration();
-        FileSystem fileSystem = FileSystem.get(new URI(inPath), conf);
+
+        FileSystem fileSystem = FileSystem.get(new URI(inPath), new Configuration());
         if (fileSystem.exists(new Path(outPath))){
             fileSystem.delete(new Path(outPath),true);
         }
 
         //获取job实例并设置主类
-        Job job = Job.getInstance(conf, "partition_test");
+        Job job = Job.getInstance(new Configuration(), "partition_test");
         job.setJarByClass(JobMain.class);
 
         /**
@@ -38,7 +40,7 @@ public class JobMain {
          */
         //1.配置文件路径和读取方式
         FileInputFormat.addInputPath(job,new Path(inPath));
-        job.setInputFormatClass(FileInputFormat.class);
+        job.setInputFormatClass(TextInputFormat.class);
         //2.配置mapper主类和数据类型
         job.setMapperClass(MyMapper.class);
         job.setMapOutputKeyClass(Text.class);
@@ -55,7 +57,7 @@ public class JobMain {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(NullWritable.class);
         //8.配置文件的输出路径和输出方式
-        job.setOutputFormatClass(FileOutputFormat.class);
+        job.setOutputFormatClass(TextOutputFormat.class);
         FileOutputFormat.setOutputPath(job,new Path(outPath));
 
         //等待程序结束
