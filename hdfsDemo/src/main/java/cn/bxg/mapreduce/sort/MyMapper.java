@@ -16,8 +16,10 @@ public class MyMapper extends Mapper<LongWritable, Text, SortBean, NullWritable>
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         SortBean sortBean = new SortBean();
         String[] line = value.toString().split("\t");
-        sortBean.setName(line[0]);
-        sortBean.setNum(Integer.parseInt(line[1]));
-        context.write(sortBean, NullWritable.get());
+        for (int i = 0; i < line.length; i++) {
+            sortBean.setName(line[0]);
+            sortBean.setNum(Integer.parseInt(line[1]));
+            context.write(sortBean, NullWritable.get());
+        }
     }
 }
