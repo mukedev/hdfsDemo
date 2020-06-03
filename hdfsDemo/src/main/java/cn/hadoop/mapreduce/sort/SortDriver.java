@@ -19,8 +19,8 @@ import java.net.URISyntaxException;
 public class SortDriver {
 
     public static void main(String[] args) throws URISyntaxException, IOException, ClassNotFoundException, InterruptedException {
-        String inputPath = "/sort";
-        String outputPath = "/outputsort";
+        String inputPath = "/sort/input2";
+        String outputPath = "/sort/output2";
 
         Configuration conf = new Configuration();
         FileSystem fs = FileSystem.get(new URI(inputPath), conf);
