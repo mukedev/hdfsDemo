@@ -1,4 +1,4 @@
-package cn.bxg.mapreduce.demo.flowcount;
+package cn.bxg.mapreduce.demo.flowpartition;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -14,13 +14,15 @@ import java.net.URISyntaxException;
 
 /**
  * @author zhangYu
- * @date 2020/6/3
- */
-public class FlowCountApp {
+ * @program hdfsDemo
+ * @description
+ * @create 2020-06-08 11:31
+ **/
+public class FlowSortApp {
 
-    public static void main(String[] args) throws URISyntaxException, IOException, ClassNotFoundException, InterruptedException {
-        String inPath = "hdfs://had-node:8020/flowCount/input";
-        String outPath = "hdfs://had-node:8020/flowCount/output";
+    public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException, URISyntaxException {
+        String inPath = "hdfs://had-node:8020/flowCount/sort_out";
+        String outPath = "hdfs://had-node:8020/flowCount/partition_out";
 
         //判断是否存在输出路径，存在则删除
         Configuration conf = new Configuration();
@@ -30,8 +32,8 @@ public class FlowCountApp {
         }
 
         //获取job实例
-        Job job = Job.getInstance(conf, "flow_count");
-        job.setJarByClass(FlowCountApp.class);
+        Job job = Job.getInstance(conf, "flow_count_sort");
+        job.setJarByClass(FlowSortApp.class);
 
         /**
          * mapreduce八大步骤
@@ -41,9 +43,10 @@ public class FlowCountApp {
         TextInputFormat.addInputPath(job, new Path(inPath));
         //配置mapper的主类和输出数据类型
         job.setMapperClass(FlowMapper.class);
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(FlowBean.class);
+        job.setMapOutputKeyClass(FlowBean.class);
+        job.setMapOutputValueClass(Text.class);
         //分区
+        job.setPartitionerClass(FlowPartitioner.class);
         //排序
         //规约
         //分组
@@ -51,6 +54,7 @@ public class FlowCountApp {
         job.setReducerClass(FlowReduce.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(FlowBean.class);
+        job.setNumReduceTasks(4);
         //配置结果文件输出路径和输出方式
         job.setOutputFormatClass(TextOutputFormat.class);
         TextOutputFormat.setOutputPath(job, new Path(outPath));
