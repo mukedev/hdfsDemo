@@ -1,4 +1,4 @@
-package cn.hadoop.mapreduce.mapjoin;
+package cn.bxg.mapreduce.mapjoin;
 
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -11,7 +11,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +19,9 @@ import java.util.Map;
  * @date 2020/6/11
  */
 public class MapJoinMapper extends Mapper<LongWritable, Text, Text, Text> {
+
+
+    Map<String, String> map = new HashMap<>();
 
     /**
      * 此方法只会执行一次
@@ -37,16 +39,16 @@ public class MapJoinMapper extends Mapper<LongWritable, Text, Text, Text> {
         URI[] cacheFiles = context.getCacheFiles();
 
         //获取指定的分布式缓存文件的文件系统（FileSystem）
-        FileSystem fileSystem = FileSystem.get(cacheFiles[0], context.getConfiguration());
+        FileSystem fileSystem = FileSystem.newInstance(cacheFiles[0], context.getConfiguration());
 
         //获取文件的输入流
         FSDataInputStream open = fileSystem.open(new Path(cacheFiles[0]));
 
         //读取文件的内容并保存到本地map中
         BufferedReader br = new BufferedReader(new InputStreamReader(open));
-        Map<String, String> map = new HashMap<>();
-        while (br.readLine() != null) {
-            String line = br.readLine();
+
+        String line = "";//br.readLine()每次执行会更改偏移量
+        while ((line = br.readLine()) != null) {
             String[] split = line.split(",");
             map.put(split[0], line);
         }
@@ -54,10 +56,17 @@ public class MapJoinMapper extends Mapper<LongWritable, Text, Text, Text> {
         //关闭流
         br.close();
         fileSystem.close();
+
+
     }
 
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
+        String[] split = value.toString().split(",");
+        String productId = split[2];
+        String productValue = map.get(productId);
+
+        context.write(new Text(productId), new Text(productValue + "," + value));
     }
 }
