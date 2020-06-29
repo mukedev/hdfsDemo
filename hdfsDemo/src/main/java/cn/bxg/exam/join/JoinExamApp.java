@@ -1,9 +1,6 @@
-package cn.bxg.exam;
+package cn.bxg.exam.join;
 
 
-import cn.bxg.exam.merge.ExamMapper;
-import cn.bxg.exam.merge.ExamReduce;
-import cn.bxg.exam.merge.LoginBean;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;

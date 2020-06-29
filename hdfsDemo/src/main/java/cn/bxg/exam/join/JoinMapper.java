@@ -1,4 +1,4 @@
-package cn.bxg.exam;
+package cn.bxg.exam.join;
 
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;

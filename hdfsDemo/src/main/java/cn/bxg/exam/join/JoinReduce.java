@@ -1,4 +1,4 @@
-package cn.bxg.exam;
+package cn.bxg.exam.join;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.NullWritable;
