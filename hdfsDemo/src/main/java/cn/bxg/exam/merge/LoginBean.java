@@ -1,4 +1,4 @@
-package cn.bxg.exam;
+package cn.bxg.exam.merge;
 
 import org.apache.hadoop.io.WritableComparable;
 

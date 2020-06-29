@@ -1,4 +1,4 @@
-package cn.bxg.exam;
+package cn.bxg.exam.merge;
 
 import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
@@ -12,17 +12,17 @@ import java.io.IOException;
  * @description
  * @create 2020-06-29 10:46
  **/
-public class ExamReduce extends Reducer<NullWritable, LoginBean, Text,NullWritable> {
+public class ExamReduce extends Reducer<Text, LoginBean, Text,NullWritable> {
 
     @Override
-    protected void reduce(NullWritable key, Iterable<LoginBean> values, Context context) throws IOException, InterruptedException {
+    protected void reduce(Text key, Iterable<LoginBean> values, Context context) throws IOException, InterruptedException {
         String first ="" ;
         String second ="";
         for (LoginBean loginBean: values) {
             if (loginBean.getLoginFlag() == 1){
                 first = loginBean.toString();
             }else {
-                second = loginBean.toString();
+                second = loginBean.getTime();
             }
         }
         context.write(new Text(first + "," + second),NullWritable.get());

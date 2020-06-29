@@ -1,6 +1,9 @@
 package cn.bxg.exam;
 
 
+import cn.bxg.exam.merge.ExamMapper;
+import cn.bxg.exam.merge.ExamReduce;
+import cn.bxg.exam.merge.LoginBean;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -20,10 +23,10 @@ import java.net.URISyntaxException;
  * @description
  * @create 2020-06-29 10:45
  **/
-public class HdfsExamApp {
+public class JoinExamApp {
     public static void main(String[] args) throws URISyntaxException, IOException, ClassNotFoundException, InterruptedException {
-        String inPath = "hdfs://node01:8020/exam/login/";
-        String outPath = "hdfs://node01:8020/exam/output";
+        String inPath = "hdfs://node01:8020/exam/output/";
+        String outPath = "hdfs://node01:8020/exam/joinOutput";
 
         Configuration conf = new Configuration();
         FileSystem fileSystem = FileSystem.get(new URI(inPath),conf);
@@ -31,8 +34,8 @@ public class HdfsExamApp {
             fileSystem.delete(new Path(outPath), true);
         }
 
-        Job job = Job.getInstance(conf,"exam");
-        job.setJarByClass(HdfsExamApp.class);
+        Job job = Job.getInstance(conf,"exam_join");
+        job.setJarByClass(JoinExamApp.class);
 
         /**
          * 八大步骤
@@ -41,16 +44,15 @@ public class HdfsExamApp {
         job.setInputFormatClass(TextInputFormat.class);
         TextInputFormat.addInputPath(job,new Path(inPath));
         //2.设置mapper类和key-value输出类型
-        job.setMapperClass(ExamMapper.class);
-        job.setMapOutputKeyClass(NullWritable.class);
-        job.setMapOutputValueClass(LoginBean.class);
+        job.setMapperClass(JoinMapper.class);
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);
         //3.分区
         //4.排序
         //5.规约
         //6.分组
-        job.setNumReduceTasks(10);
         //7.设置reduce主类和key-value输出类型
-        job.setReducerClass(ExamReduce.class);
+        job.setReducerClass(JoinReduce.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(NullWritable.class);
         //8.设置结果输出路径和输出格式
